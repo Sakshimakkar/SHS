@@ -9,20 +9,25 @@ import javax.swing.JLabel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.ResultSet;
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.Driver;
-import com.mysql.jdbc.PreparedStatement;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Driver;
 import net.proteanit.sql.DbUtils;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.border.BevelBorder;
+import java.awt.Color;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Admin {
 
@@ -34,7 +39,7 @@ public class Admin {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void AdminScreen() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -61,6 +66,20 @@ public class Admin {
 	Connection con;
 	ResultSet rs;
 	private void initialize() {
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			con = (Connection) DriverManager.getConnection("jdbc:mysql://192.168.56.40:3306/shs", "akshat", "1234");
+			//con1 = (Connection) DriverManager.getConnection("jdbc:mysql://192.168.56.40:3306/shs", "akshat", "1234");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 		frame = new JFrame();
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -74,10 +93,109 @@ public class Admin {
 				.addComponent(tabbedPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
 		);
 		
+		JPanel panel_2 = new JPanel();
+		tabbedPane.addTab("Functions", null, panel_2, null);
+		
+		JButton btnAddDepartment = new JButton("Add Department");
+		btnAddDepartment.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new Department().DepartmentScreen();
+			}
+			
+		});
+		
+		JButton btnAddDoctor = new JButton("Add Doctor");
+		btnAddDoctor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//Register doctor java file opens
+			}
+		});
+		
+		JButton btnNewButton = new JButton("Logout");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//go to login screen
+			}
+		});
+		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
+		gl_panel_2.setHorizontalGroup(
+			gl_panel_2.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_2.createSequentialGroup()
+					.addGap(159)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addComponent(btnAddDepartment)
+						.addComponent(btnAddDoctor)
+						.addGroup(gl_panel_2.createSequentialGroup()
+							.addGap(171)
+							.addComponent(btnNewButton)))
+					.addContainerGap())
+		);
+		gl_panel_2.setVerticalGroup(
+			gl_panel_2.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_2.createSequentialGroup()
+					.addGap(5)
+					.addComponent(btnNewButton)
+					.addGap(37)
+					.addComponent(btnAddDepartment)
+					.addGap(18)
+					.addComponent(btnAddDoctor)
+					.addContainerGap(104, Short.MAX_VALUE))
+		);
+		panel_2.setLayout(gl_panel_2);
+		
 		JPanel panel = new JPanel();
 		tabbedPane.addTab("View Patients", null, panel, null);
-		
 		JLabel lblViewPatients = new JLabel("View Patients");
+		
+		
+		table_1 = new JTable();
+		table_1.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.BLACK, null, null, null));
+		GroupLayout gl_panel = new GroupLayout(panel);
+		gl_panel.setHorizontalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGap(132)
+							.addComponent(lblViewPatients, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
+						.addComponent(table_1, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE))
+					.addContainerGap())
+		);
+		gl_panel.setVerticalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addComponent(lblViewPatients)
+					.addGap(18)
+					.addComponent(table_1, GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		panel.setLayout(gl_panel);
+		
+		JPanel panel_1 = new JPanel();
+		tabbedPane.addTab("View Doctors", null, panel_1, null);
+		
+		JLabel lblViewDoctors = new JLabel("View Doctors");
+		
+		table = new JTable();
+		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
+		gl_panel_1.setHorizontalGroup(
+			gl_panel_1.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_1.createSequentialGroup()
+					.addGap(144)
+					.addComponent(lblViewDoctors)
+					.addContainerGap(223, Short.MAX_VALUE))
+				.addComponent(table, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
+		);
+		gl_panel_1.setVerticalGroup(
+			gl_panel_1.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_1.createSequentialGroup()
+					.addComponent(lblViewDoctors)
+					.addGap(18)
+					.addComponent(table, GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE))
+		);
+		panel_1.setLayout(gl_panel_1);
+		frame.getContentPane().setLayout(groupLayout);
+		
 		lblViewPatients.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -85,9 +203,9 @@ public class Admin {
 				try {
 					ps = (PreparedStatement) con.prepareStatement(patients);
 				
-				ps.setString(1, "");
+				
 				rs = (ResultSet) ps.executeQuery();
-				table.setModel(DbUtils.resultSetToTableModel(rs));
+				table_1.setModel(DbUtils.resultSetToTableModel(rs));
 				
 				ps.close();
 				rs.close();
@@ -98,39 +216,12 @@ public class Admin {
 			}
 		});
 		
-		table_1 = new JTable();
-		GroupLayout gl_panel = new GroupLayout(panel);
-		gl_panel.setHorizontalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup()
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(132)
-							.addComponent(lblViewPatients, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(27)
-							.addComponent(table_1, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(217, Short.MAX_VALUE))
-		);
-		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup()
-					.addComponent(lblViewPatients)
-					.addGap(30)
-					.addComponent(table_1, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(188, Short.MAX_VALUE))
-		);
-		panel.setLayout(gl_panel);
-		
-		JPanel panel_1 = new JPanel();
-		tabbedPane.addTab("View Doctors", null, panel_1, null);
-		
-		JLabel lblViewDoctors = new JLabel("View Doctors");
 		lblViewDoctors.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				String doctors = "select distinct(name),department from doctor";
+				String doctors = "select distinct(dname),department from doctor";
 				try {
+				
 				ps = (PreparedStatement) con.prepareStatement(doctors);
 				rs = (ResultSet) ps.executeQuery();
 				table.setModel(DbUtils.resultSetToTableModel(rs));
@@ -144,31 +235,6 @@ public class Admin {
 			}
 			
 		});
-		
-		table = new JTable();
-		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
-		gl_panel_1.setHorizontalGroup(
-			gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addGap(144)
-							.addComponent(lblViewDoctors))
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addGap(24)
-							.addComponent(table, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(223, Short.MAX_VALUE))
-		);
-		gl_panel_1.setVerticalGroup(
-			gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addComponent(lblViewDoctors)
-					.addGap(26)
-					.addComponent(table, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(192, Short.MAX_VALUE))
-		);
-		panel_1.setLayout(gl_panel_1);
-		frame.getContentPane().setLayout(groupLayout);
 		
 
 }

@@ -27,6 +27,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTable;
@@ -38,6 +39,11 @@ import javax.swing.GroupLayout.Alignment;
 import java.sql.*;
 import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JScrollPane;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Doctor_display {
 
@@ -46,7 +52,6 @@ public class Doctor_display {
 	private JTextField dob;
 	private JTextField from;
 	private JTextField to;
-	private final JPanel panel_2 = new JPanel();
 	private JTable table;
 
 	public String getDid() {
@@ -59,18 +64,23 @@ public class Doctor_display {
 	/**
 	 * Launch the application.
 	 */
-	Doctor_display(String did)
+	
+	public static void main(String a[])
 	{
-		this.did = did;
+		
+		Doctor_display window = new Doctor_display("d100");
+		
+		//System.out.println("did set as :"+window.getDid());
+		window.frame.setVisible(true);
 	}
-	public static void main(String[] args) {
+/*	public static void DoctorScreen(String docid) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					
-					Doctor_display window = new Doctor_display();
-					window.setDid("d100");
-					System.out.println("did set as :"+window.getDid());
+					Doctor_display window = new Doctor_display("d100");
+					
+					//System.out.println("did set as :"+window.getDid());
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -78,12 +88,13 @@ public class Doctor_display {
 			}
 		});
 	}
-
+*/
 	/**
 	 * Create the application.
 	 */
-	public Doctor_display() {
-		initialize();
+	public Doctor_display(String docid) {
+		
+		initialize(docid);
 	}
 
 	/**
@@ -100,7 +111,7 @@ public class Doctor_display {
 	ResultSet rs_depart = null;
 	Doctor doc = null;
 	
-	private void initialize() {
+	private void initialize(String docid) {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			con = (Connection) DriverManager.getConnection("jdbc:mysql://192.168.56.40:3306/shs", "akshat", "1234");
@@ -188,6 +199,7 @@ public class Doctor_display {
 		genderlabel.setBounds(146, 45, 46, 14);
 		
 		JButton btnNewButton = new JButton("Update");
+		
 		btnNewButton.setBounds(153, 301, 89, 23);
 		
 		JLabel lblDesignation = new JLabel("Designation");
@@ -227,32 +239,46 @@ public class Doctor_display {
 		panel.add(spcialization);
 		panel.add(designation);
 		
+		JButton btnLogout = new JButton("Logout");
+		btnLogout.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// go to login sreen
+			}
+		});
+		btnLogout.setBounds(416, 1, 89, 23);
+		panel.add(btnLogout);
+		
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab("View Patients", null, panel_1, null);
 		panel_1.setLayout(new BorderLayout(0, 0));
-		panel_1.add(panel_2);
 		
 		table = new JTable();
 		table.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.BLACK, null, null, null));
 		table.setRowSelectionAllowed(false);
 		
-		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
-		gl_panel_2.setHorizontalGroup(
-			gl_panel_2.createParallelGroup(Alignment.LEADING)
-				.addComponent(table, GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
-		);
-		gl_panel_2.setVerticalGroup(
-			gl_panel_2.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_2.createSequentialGroup()
-					.addComponent(table, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(201, Short.MAX_VALUE))
-		);
-		panel_2.setLayout(gl_panel_2);
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setVisible(true);
+		panel_1.add(scrollPane);
 		
+		panel_1.setLayout(new BorderLayout());
+	        //tabs.add(header, BorderLayout.NORTH);
+		panel_1.add(scrollPane, BorderLayout.CENTER);
+	    JButton button = new JButton("Refer");
+	    button.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent arg0) {
+	    		Patient_data patient = new Patient_data();
+	    		String pid = patient.getPid();
+	    		new Refer().ReferSreen(pid, docid);
+	    		
+	    	}
+	    });
+	    panel_1.add(button, BorderLayout.SOUTH);
+	        
 		String departments = "select distinct(department) from doctor";
 		String docdetail = "select * from doctor where did = ?";
 		try {
-			String docid = "d100";
+			
 			ps =  (PreparedStatement) con.prepareStatement(docdetail);
 			ps_depart = (PreparedStatement) con1.prepareStatement(departments);
 			System.out.println("did"+docid);
@@ -270,7 +296,7 @@ public class Doctor_display {
 				consulation.addItem(rs.getString("consultationday2"));
 				consulation.addItem(rs.getString("consultationday3"));
 				from.setText(rs.getString("consultationtimefrom"));
-				from.setText(rs.getString("consultationtimeto"));
+				to.setText(rs.getString("consultationtimeto"));
 				designation.setText(rs.getString("designation"));
 				spcialization.setText(rs.getString("specialization"));
 				
@@ -288,9 +314,30 @@ public class Doctor_display {
 			ps1.setString(1, docid);
 			rs1 = ps1.executeQuery();
 			table.setModel(DbUtils.resultSetToTableModel(rs1));
-			
+			table.setAutoCreateRowSorter(true);
+			scrollPane.setViewportView(table);
 			ps1.close();
 			rs1.close();
+			
+			btnNewButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					System.out.println("department"+department.getSelectedItem());
+					String update_details = "update doctor set dob='"+dob.getText()+"',department='"+department.getSelectedItem()+"',address='"+address.getText()+"',contactno="+mobile.getText()+",consultationtimefrom='"+from.getText()+"',consultationtimeto='"+to.getText()+ "' where did = ?";
+					try {
+						ps1 = (PreparedStatement) con.prepareStatement(update_details);
+						ps1.setString(1, docid);
+						int success = ps1.executeUpdate();
+						if(success > 0)
+						{
+							JOptionPane.showMessageDialog(panel_1,"Details Updated");  
+						}
+						} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			});
 		
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
